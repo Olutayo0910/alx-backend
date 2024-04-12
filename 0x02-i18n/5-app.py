@@ -18,6 +18,7 @@ users = {
     4: {"name": "Teletubby", "locale": None, "timezone": "Europe/London"},
 }
 
+
 class Config:
     """
     Configuration class for the Flask app
@@ -26,7 +27,9 @@ class Config:
     BABEL_DEFAULT_LOCALE = 'en'
     BABEL_DEFAULT_TIMEZONE = 'UTC'
 
+
 app.config.from_object(Config)
+
 
 @babel.localeselector
 def get_locale():
@@ -38,11 +41,13 @@ def get_locale():
     else:
         return request.accept_languages.best_match(app.config['LANGUAGES'])
 
+
 def get_user(user_id):
     """
     Get user details from mock database
     """
     return users.get(user_id)
+
 
 @app.before_request
 def before_request():
@@ -52,13 +57,16 @@ def before_request():
     user_id = request.args.get('login_as')
     g.user = get_user(int(user_id)) if user_id else None
 
+
 @app.route('/')
 def index():
     """
     Render index.html template
     """
-    welcome_message = _("You are logged in as %(username)s.") % {'username': g.user['name']} if g.user else _("You are not logged in.")
-    return render_template('5-index.html', welcome_message=welcome_message, get_locale=get_locale)
+    welcome_message = _("You are logged in as %(username)s.") % \
+        {'username': g.user['name']} if g.user else _("You are not logged in.")
+    return render_template('5-index.html', welcome_message=welcome_message,
+                           get_locale=get_locale)
 
 
 if __name__ == '__main__':
