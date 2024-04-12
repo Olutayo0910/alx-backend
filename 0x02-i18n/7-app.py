@@ -6,7 +6,7 @@ This script defines a basic Flask web application with user authentication.
 """
 
 from flask import Flask, render_template, request, g
-from flask_babel import Babel, _
+from flask_babel import timezoneselector, Babel, _
 import pytz
 
 app = Flask(__name__, template_folder='templates')
@@ -88,9 +88,38 @@ def index():
     """
     welcome_message = _("You are logged in as %(username)s.") % \
         {'username': g.user['name']} if g.user else _("You are not logged in.")
-    return render_template('6-index.html', welcome_message=welcome_message,
+    return render_template('7-index.html', welcome_message=welcome_message,
                            get_locale=get_locale)
 
+
+@babel.timezoneselector
+def get_timezone():
+    """
+    Determine the best match for the supported timezones.
+
+    Returns:
+        str: The best-matched timezone based on the following criteria:
+            1. Timezone from URL parameters, if valid.
+            2. Timezone from user settings, if valid.
+            3. Default timezone ('UTC') if no valid timezone is found.
+    """
+    if 'timezone' in request.args:
+        timezone = request.args['timezone']
+        try:
+            pytz.timezone(timezone)  # Validate timezone
+            return timezone
+        except pytz.exceptions.UnknownTimeZoneError:
+            pass
+
+    if g.user and 'timezone' in g.user:
+        user_timezone = g.user['timezone']
+        try:
+            pytz.timezone(user_timezone)  # Validate timezone
+            return user_timezone
+        except pytz.exceptions.UnknownTimeZoneError:
+            pass
+
+    return 'UTC'
 
 if __name__ == '__main__':
     app.run(debug=True)
