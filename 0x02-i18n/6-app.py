@@ -39,10 +39,23 @@ def get_locale():
     """
     Determine the best match for the supported languages
     """
+
+    if 'locale' in request.args:
+        locale = request.args['locale']
+        if locale in app.config['LANGUAGES']:
+            return locale
+
     if g.user and 'locale' in g.user:
-        return g.user['locale']
-    else:
-        return request.accept_languages.best_match(app.config['LANGUAGES'])
+        user_locale = g.user['locale']
+        if user_locale in app.config['LANGUAGES']:
+            return user_locale
+
+    header_locale = request.accept_languages.best_match(app.config['LANGUAGES'])
+    if header_locale:
+        return header_locale
+
+    return app.config['BABEL_DEFAULT_LOCALE']
+
 
 
 def get_user(user_id):
