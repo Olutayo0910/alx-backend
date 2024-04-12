@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 """
 Basic Flask App with User Authentication
+
+This script defines a basic Flask web application with user authentication.
+It includes a mock user database and implements user authentication using Flask-Babel.
 """
 
 from flask import Flask, render_template, request, g
@@ -36,7 +39,9 @@ def get_locale():
     """
     Determine the best match for the supported languages
     """
-    if g.user and 'locale' in g.user:
+    if 'locale' in request.args:
+        return request.args['locale']
+    elif g.user and 'locale' in g.user:
         return g.user['locale']
     else:
         return request.accept_languages.best_match(app.config['LANGUAGES'])
@@ -45,6 +50,11 @@ def get_locale():
 def get_user(user_id):
     """
     Get user details from mock database
+
+    :param user_id: The ID of the user
+    :type user_id: int
+    :return: User details
+    :rtype: dict or None
     """
     return users.get(user_id)
 
@@ -62,9 +72,16 @@ def before_request():
 def index():
     """
     Render index.html template
+
+    :return: Rendered template
+    :rtype: str
     """
-    welcome_message = _("You are logged in as %(username)s.") % \
-        {'username': g.user['name']} if g.user else _("You are not logged in.")
+    if g.user:
+        welcome_message = _("You are logged in as %(username)s.") % \
+        {'username': g.user['name']}
+    else:
+        welcome_message = _("You are not logged in.")
+
     return render_template('5-index.html', welcome_message=welcome_message,
                            get_locale=get_locale)
 
