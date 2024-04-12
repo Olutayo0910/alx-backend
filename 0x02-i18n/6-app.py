@@ -3,7 +3,6 @@
 Basic Flask App with User Authentication
 
 This script defines a basic Flask web application with user authentication.
-It includes a mock user database and implements user authentication using Flask-Babel.
 """
 
 from flask import Flask, render_template, request, g
@@ -50,12 +49,12 @@ def get_locale():
         if user_locale in app.config['LANGUAGES']:
             return user_locale
 
-    header_locale = request.accept_languages.best_match(app.config['LANGUAGES'])
+    header_locale = request.accept_languages.best_match(app.config
+                                                        ['LANGUAGES'])
     if header_locale:
         return header_locale
 
     return app.config['BABEL_DEFAULT_LOCALE']
-
 
 
 def get_user(user_id):
